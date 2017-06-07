@@ -10,6 +10,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -28,11 +29,13 @@ public class HomeUI extends UI implements ViewDisplay {
 	@Override
 	protected void init(VaadinRequest request) {
 		//root
+		Label akcioLBL = new Label("Akciós termékek");
 		final VerticalLayout root = new VerticalLayout();
 		root.setSizeFull();
 		root.setMargin(false);
 		root.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
 		root.addStyleName("");
+		root.addComponent(akcioLBL);
 		setContent(root);
 		//navbar
 		final CssLayout navBar = new CssLayout();

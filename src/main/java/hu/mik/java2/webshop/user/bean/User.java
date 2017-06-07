@@ -8,14 +8,21 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+
+@SpringBootApplication
 @Entity
 @Table(name="t_users")
 public class User {
 	
 	@Id
-	@Column(name = "username")
+	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_GEN")
 	@SequenceGenerator(name = "SEQ_GEN", sequenceName = "s_user", allocationSize = 1, initialValue = 50)
+	private Integer id;
+	
+	@Column(name = "username")
 	private String username;
 	
 	@Column(name = "passwd")
@@ -45,6 +52,8 @@ public class User {
 	@Column(name = "phone")
 	private Integer phoneNumber;
 
+	@Column(name = "saved_products")
+	private String savedProducts;
 	
 	public String getUsername() {
 		return username;
@@ -125,7 +134,28 @@ public class User {
 	public void setPhoneNumber(Integer phoneNumber) {
 		this.phoneNumber = phoneNumber;
 	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
 	
-	
+	public String getSavedProducts() {
+		return savedProducts;
+	}
+
+	public void setSavedProducts(String savedProducts) {
+		this.savedProducts = savedProducts;
+	}
+
+	@Override
+	public String toString() {
+		return "User [username=" + username + ", passwd=" + passwd + ", email=" + email + ", first_name=" + first_name
+				+ ", last_name=" + last_name + ", city=" + city + ", street=" + street + ", houseNumber=" + houseNumber
+				+ ", postalCode=" + postalCode + ", phoneNumber=" + phoneNumber + "]";
+	}
 
 }

@@ -9,4 +9,7 @@ public interface ProductDao {
 	
 	public List<Product> findByCategoryLike(String categoryId);
 
+	public Product findByproductNameLike(String productName);
+	
+	public List<Product> findBydiscountGreaterThanEqual(Integer discountVal);
 }

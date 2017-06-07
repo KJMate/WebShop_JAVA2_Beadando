@@ -32,5 +32,21 @@ public class ProductDaoImpl implements ProductDao {
 				.setParameter("category_id", categoryId)
 				.getResultList();
 	}
+	
+	@Override
+	public Product findByproductNameLike(String product_name) {
+		return this.entityManager
+				.createQuery("SELECT DISTINCT p.product_name, p.price FROM Product p WHERE p.product_name LIKE :product_name", Product.class)
+				.setParameter("product_name", product_name)
+				.getSingleResult();
+	}
+
+	@Override
+	public List<Product> findBydiscountGreaterThanEqual(Integer discountV) {
+		return this.entityManager
+				.createQuery("SELECT p FROM Product p WHERE p.discount >= :discountV", Product.class)
+				.setParameter("discount", discountV)
+				.getResultList();
+	}
 
 }

@@ -15,14 +15,19 @@ public class UserServiceImpl implements UserService {
 	private SimpleUserDao userDao;
 
 	@Override
-	public List<User>listUsersByUserName(String username) {
-		return this.userDao.findByusernameLike(username);
+	public User listUsersByUserName(String username) {
+		return this.userDao.findByusername(username);
 	}
 
-//	@Override
-//	public User createNewUser(User user) {
-//		return this.userDao.createUser(user);
-//	}
+	@Override
+	public User save(User user) {
+		return this.userDao.save(user);
+	}
+
+	@Override
+	public List<User> listUsers() {
+		return this.userDao.findAll();
+	}
 
 
 

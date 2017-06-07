@@ -1,7 +1,6 @@
 package hu.mik.java2.webshop.vaadin;
 
 
-import java.util.List;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -29,6 +28,7 @@ public class SignInView extends VerticalLayout implements View {
 	
 	public static final String VIEW_NAME = "profile";	
 	String name, password;
+	public static User actualUser = null;
 	
 	@Autowired
 	@Qualifier("userServiceImpl")
@@ -50,16 +50,16 @@ public class SignInView extends VerticalLayout implements View {
 		logInButton.addClickListener(new ClickListener() {
 			@Override
 			public void buttonClick(ClickEvent event) {
-				List<User>	users = userService.listUsersByUserName(userNameField.getValue());
+				User user = userService.listUsersByUserName(userNameField.getValue());
 
-				 if(users.size() == 0){
+				 if(user == null){
 					
 				 }else{
-					 name = users.get(0).getUsername();
-					 password =  users.get(0).getPasswd();
+					 name = user.getUsername();
+					 password =  user.getPasswd();
 				 }
 				if(userNameField.getValue().equals(name) && passWd.getValue().equals(password)){
-					
+					actualUser = user;
 					getUI().getNavigator().navigateTo(ProfilView.VIEW_NAME);
 					
 				}else{
@@ -101,6 +101,8 @@ public class SignInView extends VerticalLayout implements View {
 	public void enter(ViewChangeEvent event) {
 		
 	}
-
+	public static User getUser() {
+		return actualUser;
+	}
 
 }

@@ -24,4 +24,14 @@ public class ProductServiceImpl implements ProductService {
 		return this.productDao.findByCategoryIdLike(categoryId);
 	}
 	
+	@Override
+	public Product listProductByProductName(String productName) {
+		return this.productDao.findByproductNameLike(productName);
+	}
+
+	@Override
+	public List<Product> listProductByDiscount(Integer discountVal) {
+		return this.productDao.findBydiscountGreaterThanEqual(discountVal);
+	}
+	
 }
