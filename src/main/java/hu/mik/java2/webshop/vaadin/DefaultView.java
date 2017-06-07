@@ -1,12 +1,9 @@
 package hu.mik.java2.webshop.vaadin;
 
 import java.util.List;
-
 import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-
 import com.vaadin.annotations.Theme;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -16,11 +13,9 @@ import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.renderers.NumberRenderer;
 import com.vaadin.ui.themes.ValoTheme;
-
 import hu.mik.java2.webshop.product.bean.Product;
 import hu.mik.java2.webshop.product.service.ProductService;
 
@@ -49,12 +44,16 @@ public class DefaultView extends VerticalLayout implements View {
 		Label lblWelcome = robot.createLabel(HomeRobot.WELCOME);
 		Label lblDescription = robot.createLabel(HomeRobot.DESCRIPTION);
 		Label lblWatermark = robot.createLabel(HomeRobot.WATERMARK);
-		Label lblAkcio = new Label("Akciós termékek");
+		Label lblDiscount = new Label("Akciós termékek");
 		productsGV = createProductsGridView();
 		productsGV.setSizeFull();
+		productsGV.setHeight("10em");
 		
 		lblWelcome.addStyleName(ValoTheme.LABEL_COLORED);
 		lblWelcome.addStyleName(ValoTheme.LABEL_H1);
+		
+		lblDiscount.addStyleName(ValoTheme.LABEL_COLORED);
+		lblDiscount.addStyleName(ValoTheme.LABEL_H2);
 		
 		lblDescription.addStyleName(ValoTheme.LABEL_NO_MARGIN);
 		lblDescription.addStyleName(ValoTheme.LABEL_H2);
@@ -62,13 +61,12 @@ public class DefaultView extends VerticalLayout implements View {
 		lblWatermark.addStyleName(ValoTheme.LABEL_COLORED);
 		
 		page.addComponent(lblWelcome);
+		page.addComponent(lblDiscount);
 		page.addComponent(productsGV);
 		page.addComponent(lblWatermark);
 		page.addComponent(lblDescription);
-		page.addComponent(lblAkcio);
 		
 		page.setComponentAlignment(lblWelcome, Alignment.TOP_CENTER);
-		page.setComponentAlignment(lblAkcio, Alignment.TOP_LEFT);
 		page.setComponentAlignment(lblWatermark, Alignment.MIDDLE_CENTER);
 		page.setComponentAlignment(lblDescription, Alignment.BOTTOM_RIGHT);
 		
@@ -78,7 +76,6 @@ public class DefaultView extends VerticalLayout implements View {
 	private Grid<Product> createProductsGridView() {
 		Grid<Product> grid = new Grid<>();
 		List<Product> products = productService.listProductByDiscount(20);
-		Notification.show(products.size() + " db");
 		grid.setItems(products);
 		grid.addColumn(Product::getId).setCaption("Azonosító").setHidden(true);
 		grid.addColumn(Product::getCategoryId).setCaption("Kategória");

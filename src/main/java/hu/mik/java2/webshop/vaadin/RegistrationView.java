@@ -45,13 +45,6 @@ public class RegistrationView extends VerticalLayout implements View {
 
 		VerticalLayout vertLayout = new VerticalLayout();
 		vertLayout.setSizeFull();
-		// vertLayout.setComponentAlignment(childComponent, alignment);
-		// VerticalLayout vertLayoutLeft = new VerticalLayout();
-		// VerticalLayout vertLayoutRight = new VerticalLayout();
-
-		// AbsoluteLayout absLayout = new AbsoluteLayout();
-		// absLayout.setSizeFull();
-
 		Panel regPanelLeft = new Panel("Regisztráció:");
 		Panel regPanelRight = new Panel("");
 		regPanelLeft.addStyleName("panelka");
@@ -101,18 +94,6 @@ public class RegistrationView extends VerticalLayout implements View {
 				} else {
 					User user = new User();
 					
-				/*	for (int i = 0; i <= users.size(); i++) {
-						if(users.get(i).getUsername().equals(userName.getValue())){
-							
-							Notification.show("Már van ilyen nevű felhasználó: " + userName.getValue() );
-							userName.setValue("");
-							
-							
-						}else{
-							user.setUsername(userName.getValue());
-						}
-					}*/
-					
 					for(User user1 : users){
 						if(user1.getUsername().equals(userName.getValue())){
 							Notification.show("Már van ilyen nevű felhasználó: " + userName.getValue() );
@@ -130,7 +111,6 @@ public class RegistrationView extends VerticalLayout implements View {
 					user.setHouseNumber((Integer.valueOf(houseNumber.getValue())));
 					user.setPostalCode((Integer.valueOf(postalCode.getValue())));
 					user.setPhoneNumber((Integer.valueOf(phone.getValue())));
-					user.setSavedProducts("nincs");
 
 					if (pw_1.getValue().equals(pw_0.getValue())) {
 						user.setPasswd(pw_1.getValue());
@@ -177,38 +157,6 @@ public class RegistrationView extends VerticalLayout implements View {
 
 		regPanelLeft.setContent(_content_l);
 		regPanelRight.setContent(_content_2);
-
-		/*
-		 * _content_2.addComponent(city); _content_2.addComponent(street);
-		 * _content_2.addComponent(houseNumber);
-		 * _content_2.addComponent(postalCode); _content_2.addComponent(phone);
-		 * _content_2.setSizeUndefined(); _content_2.setMargin(true);
-		 * 
-		 * panelRight.setContent(_content_2);
-		 */
-		/*
-		 * vertLayout.addComponent(pw_0); vertLayout.addComponent(pw_1);
-		 * vertLayout.addComponent(email); vertLayout.addComponent(keresztNev);
-		 * vertLayout.addComponent(vezetekNev); vertLayout.addComponent(city);
-		 * vertLayout.addComponent(street);
-		 * vertLayout.addComponent(houseNumber);
-		 * vertLayout.addComponent(postalCode); vertLayout.addComponent(phone);
-		 */
-		// pozicionálás:
-
-		/*
-		 * vertLayout.setComponentAlignment(userName, Alignment.TOP_CENTER);
-		 * vertLayout.setComponentAlignment(pw_0, Alignment.TOP_CENTER);
-		 * vertLayout.setComponentAlignment(pw_1, Alignment.TOP_CENTER);
-		 * vertLayout.setComponentAlignment(email, Alignment.TOP_CENTER);
-		 * vertLayout.setComponentAlignment(keresztNev, Alignment.TOP_CENTER);
-		 * vertLayout.setComponentAlignment(vezetekNev, Alignment.TOP_CENTER);
-		 * vertLayout.setComponentAlignment(city, Alignment.TOP_CENTER);
-		 * vertLayout.setComponentAlignment(street, Alignment.TOP_CENTER);
-		 * vertLayout.setComponentAlignment(houseNumber, Alignment.TOP_CENTER);
-		 * vertLayout.setComponentAlignment(postalCode, Alignment.TOP_CENTER);
-		 * vertLayout.setComponentAlignment(phone, Alignment.TOP_CENTER);
-		 */
 
 		return vertLayout;
 	}

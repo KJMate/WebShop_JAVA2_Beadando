@@ -29,7 +29,6 @@
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-spring-boot-starter</artifactId>
-			<version>1.0.0</version>
 		</dependency>
 
 		<dependency>
@@ -41,13 +40,11 @@
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-server</artifactId>
-			<version>8.0.0</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.vaadin/vaadin-client -->
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-client</artifactId>
-			<version>8.0.0</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.vaadin/vaadin -->
 		<dependency>
@@ -95,7 +92,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
-			<version>1.5.3.RELEASE</version>
 		</dependency>
 
 		<dependency>

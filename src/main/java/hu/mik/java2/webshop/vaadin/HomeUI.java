@@ -10,7 +10,6 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -29,13 +28,11 @@ public class HomeUI extends UI implements ViewDisplay {
 	@Override
 	protected void init(VaadinRequest request) {
 		//root
-		Label akcioLBL = new Label("Akciós termékek");
 		final VerticalLayout root = new VerticalLayout();
 		root.setSizeFull();
 		root.setMargin(false);
 		root.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
 		root.addStyleName("");
-		root.addComponent(akcioLBL);
 		setContent(root);
 		//navbar
 		final CssLayout navBar = new CssLayout();
@@ -43,7 +40,8 @@ public class HomeUI extends UI implements ViewDisplay {
 		navBar.addComponent(createNavButton("Kezdőlap", DefaultView.VIEW_NAME));
 		navBar.addComponent(createNavButton("Belépés", SignInView.VIEW_NAME));
 		navBar.addComponent(createNavButton("Termékek", ProductsView.VIEW_NAME));
-		navBar.addComponent(createNavButton("Kosár", ShoppingCartView.VIEW_NAME));
+		//navBar.addComponent(createNavButton("Kosár", ShoppingCartView.VIEW_NAME));
+		navBar.addComponent(profilButton("Kosár", ProfilView.VIEW_NAME));
 		//menubar
 		final VerticalLayout menuBar = new VerticalLayout();
 		menuBar.setMargin(false);
@@ -59,6 +57,24 @@ public class HomeUI extends UI implements ViewDisplay {
 		homeViewDisplay.addStyleName(ValoTheme.PANEL_BORDERLESS);
 		root.addComponent(homeViewDisplay);
 		root.setExpandRatio(homeViewDisplay, 1.0f);
+	}
+
+	private Component profilButton(String caption, String viewName) {
+		Button btn = new Button(caption);
+		btn.addStyleName(ValoTheme.BUTTON_SMALL);
+		btn.addClickListener(new ClickListener() {
+			@Override
+			public void buttonClick(ClickEvent event) {
+				if(SignInView.actualUser == null){
+				getUI().getNavigator().navigateTo(SignInView.VIEW_NAME);
+				}else{
+					getUI().getNavigator().navigateTo(ProfilView.VIEW_NAME);
+				}
+			}
+		});
+		btn.addStyleName(ValoTheme.BUTTON_LARGE);
+		btn.addStyleName(ValoTheme.BUTTON_PRIMARY);
+		return btn;
 	}
 
 	private Button createNavButton(String caption, final String viewName) {

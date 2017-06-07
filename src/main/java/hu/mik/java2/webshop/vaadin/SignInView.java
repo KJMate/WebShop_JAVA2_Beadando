@@ -105,4 +105,13 @@ public class SignInView extends VerticalLayout implements View {
 		return actualUser;
 	}
 
+	public static User getActualUser() {
+		return actualUser;
+	}
+
+	public static void setActualUser(User actualUser) {
+		SignInView.actualUser = actualUser;
+	}
+	
+
 }
