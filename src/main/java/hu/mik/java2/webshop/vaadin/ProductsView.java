@@ -21,6 +21,8 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.renderers.NumberRenderer;
 import com.vaadin.ui.themes.ValoTheme;
+import hu.mik.java2.webshop.category.bean.Category;
+import hu.mik.java2.webshop.category.service.CategoryService;
 import hu.mik.java2.webshop.product.bean.Product;
 import hu.mik.java2.webshop.product.service.ProductService;
 import hu.mik.java2.webshop.user.bean.User;
@@ -39,30 +41,38 @@ public class ProductsView extends VerticalLayout implements View {
 	@Autowired
 	@Qualifier("userServiceImpl")
 	private UserService userService;
+	
+	@Autowired
+	@Qualifier("categoryServiceImpl")
+	private CategoryService catService;
 
 	public static User actualUser = null;
 	String saved = "";
 	private Panel products;
 	
 	private Grid<Product> productsGV;
-
+	List<Product> products1 ;
+	List<Category> categories;
+	
 	@PostConstruct
 	void init() {
 		Page.getCurrent().setTitle("Web Shop - Termékek");
 		final VerticalLayout root = new VerticalLayout();
 		root.setMargin(false);
 		root.setSizeFull();
-
+		products1 = productService.listProducts();
+		categories = catService.listCategories();
 		final CssLayout page = new CssLayout();
 		page.setSizeFull();
 
 		final CssLayout filter = new CssLayout();
 		filter.setWidth(20f, Unit.PERCENTAGE);
 		filter.addStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
-		filter.addComponent(createFilterButton("Okos eszközök"));
-		filter.addComponent(createFilterButton("TV és Szórakozás"));
-		filter.addComponent(createFilterButton("Sport és szabadidő"));
-
+		
+		for(Category categ : categories){
+			filter.addComponent(createFilterButton(categ));
+		}
+		
 		Button btnAddToCart = new Button("Kosárhoz adás");
 		btnAddToCart.addClickListener(new ClickListener() {
 			@Override
@@ -71,8 +81,7 @@ public class ProductsView extends VerticalLayout implements View {
 				if(user == null) {
 					getUI().getNavigator().navigateTo(SignInView.VIEW_NAME);
 				} else {
-					Collection<Product> selectedProducts = productsGV.getSelectedItems();
-					
+					Collection<Product> selectedProducts = productsGV.getSelectedItems();					
 					for (Product product : selectedProducts) {
 						saved += product.getProductName() + ";";
 					}
@@ -99,12 +108,12 @@ public class ProductsView extends VerticalLayout implements View {
 		this.addComponent(root);
 	}
 
-	private Button createFilterButton(String caption) {
-		Button btn = new Button(caption);
+	private Button createFilterButton(Category caption) {
+		Button btn = new Button(caption.getCategory_name());
 		btn.addClickListener(new ClickListener() {
 			@Override
 			public void buttonClick(ClickEvent event) {
-				productsGV = createProductsGridView(caption);
+				productsGV = createProductsGridView(caption.getCategory_id());
 				productsGV.setSizeFull();
 				products.setContent(productsGV);
 			}
@@ -116,10 +125,10 @@ public class ProductsView extends VerticalLayout implements View {
 
 	private Grid<Product> createProductsGridView() {
 		Grid<Product> grid = new Grid<>();
-		List<Product> products = productService.listProducts();
-		grid.setItems(products);
+		
+		grid.setItems(products1);
 		grid.addColumn(Product::getId).setCaption("Azonosító").setHidden(true);
-		grid.addColumn(Product::getCategoryId).setCaption("Kategória");
+		grid.addColumn(Product::getCategory).setCaption("Kategória");
 		grid.addColumn(Product::getProductName).setCaption("Név");
 		grid.addColumn(Product::getDescription).setCaption("Leírás");
 		grid.addColumn(Product::getPrice, new NumberRenderer("%d Ft")).setCaption("Ár");
@@ -128,12 +137,12 @@ public class ProductsView extends VerticalLayout implements View {
 		return grid;
 	}
 	
-	private Grid<Product> createProductsGridView(String filter) {
+	private Grid<Product> createProductsGridView(Integer filter) {
 		Grid<Product> grid = new Grid<>();
 		List<Product> products = productService.listProductsByCategoryId(filter);
 		grid.setItems(products);
 		grid.addColumn(Product::getId).setCaption("Azonosító").setHidden(true);
-		grid.addColumn(Product::getCategoryId).setCaption("Kategória");
+		grid.addColumn(Product::getCategory).setCaption("Kategória");
 		grid.addColumn(Product::getProductName).setCaption("Név");
 		grid.addColumn(Product::getDescription).setCaption("Leírás");
 		grid.addColumn(Product::getPrice, new NumberRenderer("%d Ft")).setCaption("Ár");

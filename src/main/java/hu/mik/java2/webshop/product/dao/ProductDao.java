@@ -7,9 +7,13 @@ public interface ProductDao {
 	
 	public List<Product> findAll();
 	
-	public List<Product> findByCategoryLike(String categoryId);
+	public List<Product> findByCategoryLike(Integer categoryId);
 
 	public Product findByproductNameLike(String productName);
 	
 	public List<Product> findBydiscountGreaterThanEqual(Integer discountVal);
+	
+	public Product save(Product product);
+	
+	public void delete(Product product);
 }

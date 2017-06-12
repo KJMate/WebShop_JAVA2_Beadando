@@ -1,10 +1,9 @@
 package hu.mik.java2.webshop.vaadin;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-
 import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import com.vaadin.annotations.Theme;
@@ -20,11 +19,13 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.renderers.NumberRenderer;
 import com.vaadin.ui.themes.ValoTheme;
 import hu.mik.java2.webshop.product.bean.Product;
 import hu.mik.java2.webshop.product.service.ProductService;
 import hu.mik.java2.webshop.user.bean.User;
+import hu.mik.java2.webshop.user.service.UserService;
 
 @Theme("valo")
 @SuppressWarnings("serial")
@@ -34,6 +35,12 @@ public class ProfilView extends VerticalLayout implements View {
 	public static final String VIEW_NAME = "myprofile";
 
 	public static User actualUser = null;
+	Grid<Product> grid = new Grid<>();
+	Collection<Product> torlendoElemek;
+	
+	@Autowired
+	@Qualifier("userServiceImpl")
+	private UserService userService;
 
 	@Autowired
 	@Qualifier("productServiceImpl")
@@ -57,7 +64,7 @@ public class ProfilView extends VerticalLayout implements View {
 		root.addComponent(lblTitle);
 		String savedProducts = actualUser.getSavedProducts();
 
-		if (savedProducts == null) {
+		if ( savedProducts == null || savedProducts.equals("")) {
 
 			root.addComponent(noProductLabel);
 			root.setComponentAlignment(noProductLabel, Alignment.MIDDLE_CENTER);
@@ -66,20 +73,47 @@ public class ProfilView extends VerticalLayout implements View {
 
 			productNames = savedProducts.split(";");
 
-			// if(productNames.length > 0) {
 			productsGV = createSavedProductsGV(productNames);
 			productsGV.setSizeFull();
 			root.addComponent(productsGV);
 			root.setComponentAlignment(productsGV, Alignment.MIDDLE_CENTER);
-			// }
 		}
 
 		root.setComponentAlignment(lblTitle, Alignment.TOP_CENTER);
 
 		payment();
 		signOut();
+		deleteProducts();
 
 		this.addComponent(root);
+	}
+
+	private void deleteProducts() {
+		Button delete = new Button("Törlés a kosárból");
+
+		delete.addClickListener(new ClickListener() {
+			@Override
+			public void buttonClick(ClickEvent event) {		
+				torlendoElemek = grid.getSelectedItems();
+				String mentettElem = "";
+				for(String elem : productNames){
+					for(Product torlendo : torlendoElemek){
+						if(elem.equals(torlendo.getProductName())){
+							
+						}else{
+							mentettElem += elem + ";";
+						}
+					}
+				}
+				actualUser.setSavedProducts(mentettElem);
+				userService.save(actualUser);
+				productNames = mentettElem.split(";");
+				//createSavedProductsGV(productNames);
+			}
+		});
+		this.addComponent(delete);
+		this.setComponentAlignment(delete, Alignment.BOTTOM_RIGHT);
+		
 	}
 
 	private void signOut() {
@@ -120,7 +154,7 @@ public class ProfilView extends VerticalLayout implements View {
 	private Grid<Product> createSavedProductsGV(String[] products) {
 		List<Product> savedProducts = new ArrayList<>();
 		Product productBuffer = null;
-		Grid<Product> grid = new Grid<>();
+		
 		for (String name : products) {
 			productBuffer = productService.listProductByProductName(name);
 			savedProducts.add(productBuffer);
@@ -128,12 +162,13 @@ public class ProfilView extends VerticalLayout implements View {
 		grid.setItems(savedProducts);
 
 		grid.addColumn(Product::getId).setCaption("Azonosító").setHidden(true);
-		grid.addColumn(Product::getCategoryId).setCaption("Kategória");
+		//grid.addColumn(Product::getCategoryId).setCaption("Kategória");
 		grid.addColumn(Product::getProductName).setCaption("Név");
 		grid.addColumn(Product::getDescription).setCaption("Leírás");
 		grid.addColumn(Product::getPrice, new NumberRenderer("%d Ft")).setCaption("Ár");
 		grid.addColumn(Product::getDiscount, new NumberRenderer("%d %%")).setCaption("Kedvezmény");
-		grid.getSelectionModel().setUserSelectionAllowed(false);
+		grid.getSelectionModel().setUserSelectionAllowed(true);
+		grid.setSelectionMode(SelectionMode.SINGLE);
 		return grid;
 	}
 

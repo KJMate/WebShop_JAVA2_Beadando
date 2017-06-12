@@ -7,7 +7,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 
@@ -19,7 +18,7 @@ public class User {
 	@Id
 	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_GEN")
-	@SequenceGenerator(name = "SEQ_GEN", sequenceName = "s_user", allocationSize = 1, initialValue = 50)
+	@SequenceGenerator(name = "SEQ_GEN", sequenceName = "S_USER", allocationSize = 1, initialValue = 50)
 	private Integer id;
 	
 	@Column(name = "username")

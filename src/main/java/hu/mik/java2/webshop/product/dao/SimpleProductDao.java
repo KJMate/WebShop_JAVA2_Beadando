@@ -8,7 +8,10 @@ import hu.mik.java2.webshop.product.bean.Product;
 
 public interface SimpleProductDao extends JpaRepository<Product, Integer>{
 	
-	public List<Product> findByCategoryIdLike(String categoryId);
+	@SuppressWarnings("unchecked")
+	public Product save(Product product);
+	
+	public List<Product> findByCategoryIdLike(Integer categoryId);
 	
 	public Product findByproductNameLike(String productName);
 	

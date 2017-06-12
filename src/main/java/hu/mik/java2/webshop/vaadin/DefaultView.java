@@ -78,7 +78,7 @@ public class DefaultView extends VerticalLayout implements View {
 		List<Product> products = productService.listProductByDiscount(20);
 		grid.setItems(products);
 		grid.addColumn(Product::getId).setCaption("Azonosító").setHidden(true);
-		grid.addColumn(Product::getCategoryId).setCaption("Kategória");
+		//grid.addColumn(Product::getCategoryId).setCaption("Kategória");
 		grid.addColumn(Product::getProductName).setCaption("Név");
 		grid.addColumn(Product::getDescription).setCaption("Leírás");
 		grid.addColumn(Product::getPrice, new NumberRenderer("%d Ft")).setCaption("Ár");

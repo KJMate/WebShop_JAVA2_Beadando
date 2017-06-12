@@ -20,7 +20,7 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public List<Product> listProductsByCategoryId(String categoryId) {
+	public List<Product> listProductsByCategoryId(Integer categoryId) {
 		return this.productDao.findByCategoryIdLike(categoryId);
 	}
 	
@@ -32,6 +32,16 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	public List<Product> listProductByDiscount(Integer discountVal) {
 		return this.productDao.findBydiscountGreaterThanEqual(discountVal);
+	}
+
+	@Override
+	public Product save(Product product) {
+		return this.productDao.save(product);
+	}
+
+	@Override
+	public void deleteProduct(Product product) {
+		this.productDao.delete(product);
 	}
 	
 }

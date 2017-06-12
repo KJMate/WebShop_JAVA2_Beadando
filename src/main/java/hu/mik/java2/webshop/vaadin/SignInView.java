@@ -58,10 +58,13 @@ public class SignInView extends VerticalLayout implements View {
 					 name = user.getUsername();
 					 password =  user.getPasswd();
 				 }
-				if(userNameField.getValue().equals(name) && passWd.getValue().equals(password)){
+				if(userNameField.getValue().equals(name) && passWd.getValue().equals(password)) {
 					actualUser = user;
-					getUI().getNavigator().navigateTo(ProfilView.VIEW_NAME);
-					
+					if(userNameField.getValue().equals("admin")) {
+						getUI().getNavigator().navigateTo(AdminView.VIEW_NAME);
+					} else {
+						getUI().getNavigator().navigateTo(ProfilView.VIEW_NAME);
+					}
 				}else{
 					Notification.show("Hibás felhasználó név és/vagy jelszó!");					
 				}

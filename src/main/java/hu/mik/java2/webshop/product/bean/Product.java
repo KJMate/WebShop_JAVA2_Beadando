@@ -1,27 +1,42 @@
 package hu.mik.java2.webshop.product.bean;
 
+import java.io.Serializable;
 import javax.persistence.*;
+import hu.mik.java2.webshop.category.bean.Category;
 
 @Entity
 @Table(name = "t_products")
-public class Product {
+public class Product implements Serializable{
 	
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+
 	@Id
 	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_GEN")
-	@SequenceGenerator(name = "SEQ_GEN", sequenceName = "productSeq", allocationSize = 1, initialValue = 50)
+	@SequenceGenerator(name = "SEQ_GEN", sequenceName = "T_PROD_SEQ", allocationSize = 1, initialValue = 50)
 	private Integer id;
 	
-	@Column(name = "category_id")
-	private String categoryId;
+	
 	@Column(name = "product_name")
 	private String productName;
+	
 	@Column(name = "price")
 	private Integer price;
+	
 	@Column(name = "description")
 	private String description;
+	
 	@Column(name = "discount")
 	private Integer discount;
+	
+	@JoinColumn(name = "category_id", referencedColumnName = "category_id")
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+	private Category category;
 	
 	public Integer getId() {
 		return id;
@@ -29,12 +44,7 @@ public class Product {
 	public void setId(Integer id) {
 		this.id = id;
 	}
-	public String getCategoryId() {
-		return categoryId;
-	}
-	public void setCategoryId(String categoryId) {
-		this.categoryId = categoryId;
-	}
+
 	public String getProductName() {
 		return productName;
 	}
@@ -58,6 +68,18 @@ public class Product {
 	}
 	public void setDiscount(Integer discount) {
 		this.discount = discount;
+	}
+	
+	public Category getCategory() {
+		return category;
+	}
+	public void setCategory(Category category) {
+		this.category = category;
+	}
+	
+	@Override
+	public String toString() {
+		return category.getCategory_name();
 	}
 	
 }
