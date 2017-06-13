@@ -198,7 +198,7 @@ public class AdminView extends VerticalLayout implements View {
 	private Grid<Product> createGrid() {
 		Grid<Product> pgv = new Grid<>();
 		List<Product> products = productService.listProducts();
-		pgv.addColumn(Product::getId).setCaption("Azonosító");
+		//pgv.addColumn(Product::getId).setCaption("Azonosító");
 		pgv.addColumn(Product::getCategory).setCaption("Kategória");
 		pgv.addColumn(Product::getProductName).setCaption("Név");
 		pgv.addColumn(Product::getDescription).setCaption("Leírás");

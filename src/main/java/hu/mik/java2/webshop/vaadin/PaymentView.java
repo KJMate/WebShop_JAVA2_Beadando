@@ -29,6 +29,8 @@ import com.vaadin.ui.renderers.NumberRenderer;
 
 import hu.mik.java2.webshop.product.bean.Product;
 import hu.mik.java2.webshop.product.service.ProductService;
+import hu.mik.java2.webshop.shoppingcart.bean.ShoppingCart;
+import hu.mik.java2.webshop.shoppingcart.service.ShoppingCartService;
 import hu.mik.java2.webshop.user.bean.User;
 import hu.mik.java2.webshop.user.service.UserService;
 
@@ -45,15 +47,24 @@ public class PaymentView extends VerticalLayout implements View {
 	@Autowired
 	@Qualifier("userServiceImpl")
 	private UserService userService;
+	
+	@Autowired
+	@Qualifier("shoppingCartServiceImpl")
+	private ShoppingCartService shoppingCartService;
 
-	User actualUser = SignInView.getUser();
-	Integer osszeg = 0;
+	private User actualUser = SignInView.getUser();
+	private Integer osszeg = 0;
+	
+	private List<Product> termekLista = new ArrayList<>();
+	private List<ShoppingCart> bevKocsiLista;
+	private List<User> lista;
 	
 	@PostConstruct
 	void init() {
 		Page.getCurrent().setTitle("Web Shop - Fizetés");
 		HorizontalLayout horiLay = new HorizontalLayout();
-		
+		bevKocsiLista = shoppingCartService.findAll();
+		lista = userService.listUsers();
 		horiLay.addComponent(createProductsGridView());
 		horiLay.addComponent(paymentDetails());
 
@@ -100,17 +111,20 @@ public class PaymentView extends VerticalLayout implements View {
 
 	private VerticalLayout createProductsGridView() {
 		VerticalLayout vertLayout = new VerticalLayout();
-		String[] productNames = actualUser.getSavedProducts().split(";");
+	
 		Grid<Product> grid = new Grid<>();
-		List<Product> savedProducts = new ArrayList<>();
-		Product productBuffer = null;
+		for (User user : lista) {
+			if (user.getId() == actualUser.getId()) {
+				for (ShoppingCart kocsi : bevKocsiLista) {
+					if (kocsi.getUser_id() == actualUser.getId() && kocsi.getIsPaid() == 0) {
+						termekLista.add(kocsi.getProduct());
+					}
+				}
 
-		for (String name : productNames) {
-			productBuffer = productService.listProductByProductName(name);
-			savedProducts.add(productBuffer);
+			}
 		}
-		grid.setItems(savedProducts);
-		grid.addColumn(Product::getId).setCaption("Azonosító").setHidden(true);
+
+		grid.setItems(termekLista);
 		grid.addColumn(Product::getProductName).setCaption("Név");
 		grid.addColumn(Product::getDescription).setCaption("Leírás");
 		grid.addColumn(Product::getPrice, new NumberRenderer("%d Ft")).setCaption("Ár");
@@ -118,7 +132,7 @@ public class PaymentView extends VerticalLayout implements View {
 		vertLayout.addComponent(grid);
 		
 		
-		for(Product product1 : savedProducts){
+		for(Product product1 : termekLista){
 			osszeg += product1.getPrice();
 		}
 				
@@ -127,8 +141,17 @@ public class PaymentView extends VerticalLayout implements View {
 	}
 	
 	private void updateUser() {
-		actualUser.setSavedProducts("");
-		userService.save(actualUser);
+		for (User user : lista) {
+			if (user.getId() == actualUser.getId()) {
+				for (ShoppingCart kocsi : bevKocsiLista) {
+					if (kocsi.getUser_id() == actualUser.getId() && kocsi.getIsPaid() == 0) {
+						kocsi.setIsPaid(1);
+						shoppingCartService.save(kocsi);
+					}
+				}
+
+			}
+		}
 		
 	}
 	

@@ -16,4 +16,6 @@ public interface ProductService {
 	public List<Product> listProductByDiscount(Integer discountVal);
 
 	public void deleteProduct(Product product);
+	
+	public Product listProductsById(Integer id);
 }

@@ -28,7 +28,7 @@ public class ProductDaoImpl implements ProductDao {
 	@Override
 	public List<Product> findByCategoryLike(Integer categoryId) {
 		return this.entityManager
-				.createQuery("SELECT p FROM Product p WHERE p.category_id LIKE :categoryId", Product.class)
+				.createQuery("SELECT p FROM Product p WHERE p.categoryId LIKE :categoryId", Product.class)
 				.setParameter("category_id", categoryId)
 				.getResultList();
 	}
@@ -60,6 +60,14 @@ public class ProductDaoImpl implements ProductDao {
 			this.entityManager.merge(product);
 		}
 		this.entityManager.remove(product);
+	}
+
+	@Override
+	public Product findByIdLike(Integer id) {
+		return this.entityManager
+				.createQuery("SELECT p FROM Product p WHERE p.id LIKE id", Product.class)
+				.setParameter("discount", id)
+				.getSingleResult();
 	}
 
 }

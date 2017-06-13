@@ -25,6 +25,8 @@ import hu.mik.java2.webshop.category.bean.Category;
 import hu.mik.java2.webshop.category.service.CategoryService;
 import hu.mik.java2.webshop.product.bean.Product;
 import hu.mik.java2.webshop.product.service.ProductService;
+import hu.mik.java2.webshop.shoppingcart.bean.ShoppingCart;
+import hu.mik.java2.webshop.shoppingcart.service.ShoppingCartService;
 import hu.mik.java2.webshop.user.bean.User;
 import hu.mik.java2.webshop.user.service.UserService;
 
@@ -37,23 +39,26 @@ public class ProductsView extends VerticalLayout implements View {
 	@Autowired
 	@Qualifier("productServiceImpl")
 	private ProductService productService;
-	
+
 	@Autowired
 	@Qualifier("userServiceImpl")
 	private UserService userService;
-	
+
 	@Autowired
 	@Qualifier("categoryServiceImpl")
 	private CategoryService catService;
 
+	@Autowired
+	@Qualifier("shoppingCartServiceImpl")
+	private ShoppingCartService shoppingCartService;
+
 	public static User actualUser = null;
-	String saved = "";
 	private Panel products;
-	
+
 	private Grid<Product> productsGV;
-	List<Product> products1 ;
+	List<Product> products1;
 	List<Category> categories;
-	
+
 	@PostConstruct
 	void init() {
 		Page.getCurrent().setTitle("Web Shop - Termékek");
@@ -68,32 +73,37 @@ public class ProductsView extends VerticalLayout implements View {
 		final CssLayout filter = new CssLayout();
 		filter.setWidth(20f, Unit.PERCENTAGE);
 		filter.addStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
-		
-		for(Category categ : categories){
+
+		for (Category categ : categories) {
 			filter.addComponent(createFilterButton(categ));
 		}
-		
+
 		Button btnAddToCart = new Button("Kosárhoz adás");
 		btnAddToCart.addClickListener(new ClickListener() {
 			@Override
 			public void buttonClick(ClickEvent event) {
 				User user = SignInView.getUser();
-				if(user == null) {
+				ShoppingCart shoppingCart = new ShoppingCart();
+
+				if (user == null) {
 					getUI().getNavigator().navigateTo(SignInView.VIEW_NAME);
 				} else {
-					Collection<Product> selectedProducts = productsGV.getSelectedItems();					
+					Collection<Product> selectedProducts = productsGV.getSelectedItems();
 					for (Product product : selectedProducts) {
-						saved += product.getProductName() + ";";
+							shoppingCart = new ShoppingCart();
+							shoppingCart.setUser_id(user.getId());
+							shoppingCart.setProduct(product);
+							shoppingCart.setIsPaid(0);
+							shoppingCartService.save(shoppingCart);
 					}
-					user.setSavedProducts(saved);
-					userService.save(user);
+
 					Notification.show("Sikeresen a kosárba rakta a terméket");
 				}
 			}
 		});
-		
+
 		filter.addComponent(btnAddToCart);
-		
+
 		products = new Panel();
 		productsGV = createProductsGridView();
 		productsGV.setSizeFull();
@@ -125,9 +135,8 @@ public class ProductsView extends VerticalLayout implements View {
 
 	private Grid<Product> createProductsGridView() {
 		Grid<Product> grid = new Grid<>();
-		
+
 		grid.setItems(products1);
-		grid.addColumn(Product::getId).setCaption("Azonosító").setHidden(true);
 		grid.addColumn(Product::getCategory).setCaption("Kategória");
 		grid.addColumn(Product::getProductName).setCaption("Név");
 		grid.addColumn(Product::getDescription).setCaption("Leírás");
@@ -136,12 +145,11 @@ public class ProductsView extends VerticalLayout implements View {
 		grid.setSelectionMode(SelectionMode.MULTI);
 		return grid;
 	}
-	
+
 	private Grid<Product> createProductsGridView(Integer filter) {
 		Grid<Product> grid = new Grid<>();
 		List<Product> products = productService.listProductsByCategoryId(filter);
 		grid.setItems(products);
-		grid.addColumn(Product::getId).setCaption("Azonosító").setHidden(true);
 		grid.addColumn(Product::getCategory).setCaption("Kategória");
 		grid.addColumn(Product::getProductName).setCaption("Név");
 		grid.addColumn(Product::getDescription).setCaption("Leírás");

@@ -3,6 +3,7 @@ package hu.mik.java2.webshop.product.bean;
 import java.io.Serializable;
 import javax.persistence.*;
 import hu.mik.java2.webshop.category.bean.Category;
+import hu.mik.java2.webshop.shoppingcart.bean.ShoppingCart;
 
 @Entity
 @Table(name = "t_products")
@@ -38,6 +39,9 @@ public class Product implements Serializable{
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
 	private Category category;
 	
+	@OneToOne(fetch=FetchType.EAGER, mappedBy="product")
+	private ShoppingCart shoppingCart;	
+		
 	public Integer getId() {
 		return id;
 	}

@@ -1,20 +1,31 @@
 package hu.mik.java2.webshop.user.bean;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import hu.mik.java2.webshop.shoppingcart.bean.ShoppingCart;
 
 
 @SpringBootApplication
 @Entity
 @Table(name="t_users")
-public class User {
+public class User implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_GEN")
@@ -51,8 +62,10 @@ public class User {
 	@Column(name = "phone")
 	private Integer phoneNumber;
 
-	@Column(name = "saved_products")
-	private String savedProducts;
+	@JoinColumn(name = "SAVED_PRODUCTS", referencedColumnName = "product_id")
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
+	private ShoppingCart shoppingCart;
+	
 	
 	public String getUsername() {
 		return username;
@@ -140,14 +153,6 @@ public class User {
 
 	public void setId(Integer id) {
 		this.id = id;
-	}
-	
-	public String getSavedProducts() {
-		return savedProducts;
-	}
-
-	public void setSavedProducts(String savedProducts) {
-		this.savedProducts = savedProducts;
 	}
 
 	@Override

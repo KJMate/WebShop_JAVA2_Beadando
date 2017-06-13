@@ -15,7 +15,6 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -24,6 +23,8 @@ import com.vaadin.ui.renderers.NumberRenderer;
 import com.vaadin.ui.themes.ValoTheme;
 import hu.mik.java2.webshop.product.bean.Product;
 import hu.mik.java2.webshop.product.service.ProductService;
+import hu.mik.java2.webshop.shoppingcart.bean.ShoppingCart;
+import hu.mik.java2.webshop.shoppingcart.service.ShoppingCartService;
 import hu.mik.java2.webshop.user.bean.User;
 import hu.mik.java2.webshop.user.service.UserService;
 
@@ -35,9 +36,7 @@ public class ProfilView extends VerticalLayout implements View {
 	public static final String VIEW_NAME = "myprofile";
 
 	public static User actualUser = null;
-	Grid<Product> grid = new Grid<>();
-	Collection<Product> torlendoElemek;
-	
+
 	@Autowired
 	@Qualifier("userServiceImpl")
 	private UserService userService;
@@ -46,8 +45,14 @@ public class ProfilView extends VerticalLayout implements View {
 	@Qualifier("productServiceImpl")
 	private ProductService productService;
 
+	@Autowired
+	@Qualifier("shoppingCartServiceImpl")
+	private ShoppingCartService shoppingCartService;
+
 	private Grid<Product> productsGV;
-	String[] productNames;
+
+	List<Product> termekLista = new ArrayList<>();
+	List<ShoppingCart> bevKocsiLista;
 
 	@PostConstruct
 	void init() {
@@ -62,30 +67,65 @@ public class ProfilView extends VerticalLayout implements View {
 		lblTitle.setStyleName(ValoTheme.LABEL_H1);
 		lblTitle.addStyleName(ValoTheme.LABEL_COLORED);
 		root.addComponent(lblTitle);
-		String savedProducts = actualUser.getSavedProducts();
 
-		if ( savedProducts == null || savedProducts.equals("")) {
+		List<User> lista = userService.listUsers();
+		bevKocsiLista = shoppingCartService.findAll();
 
-			root.addComponent(noProductLabel);
-			root.setComponentAlignment(noProductLabel, Alignment.MIDDLE_CENTER);
+		for (User user : lista) {
+			if (user.getId() == actualUser.getId()) {
+				for (ShoppingCart kocsi : bevKocsiLista) {
+					if (kocsi.getUser_id() == actualUser.getId() && kocsi.getIsPaid() == 0) {
+						termekLista.add(kocsi.getProduct());
+					} else {
+						root.addComponent(noProductLabel);
+						root.setComponentAlignment(noProductLabel, Alignment.MIDDLE_CENTER);
+					}
+				}
 
-		} else {
-
-			productNames = savedProducts.split(";");
-
-			productsGV = createSavedProductsGV(productNames);
-			productsGV.setSizeFull();
-			root.addComponent(productsGV);
-			root.setComponentAlignment(productsGV, Alignment.MIDDLE_CENTER);
+			}
 		}
+
+		productsGV = createSavedProductsGV(termekLista);
+		productsGV.setSizeFull();
+		root.addComponent(productsGV);
 
 		root.setComponentAlignment(lblTitle, Alignment.TOP_CENTER);
 
 		payment();
 		signOut();
 		deleteProducts();
-
+		history();
 		this.addComponent(root);
+	}
+
+	private void history() {
+		Button history = new Button("Előzmények");
+
+		history.addClickListener(new ClickListener() {
+			@Override
+			public void buttonClick(ClickEvent event) {
+				List<User> lista = userService.listUsers();
+				for (User user : lista) {
+					if (user.getId() == actualUser.getId()) {
+						for (ShoppingCart kocsi : bevKocsiLista) {
+							if (kocsi.getUser_id() == actualUser.getId()) {
+								termekLista.add(kocsi.getProduct());
+							} 
+						}
+
+					}
+				}
+				productsGV = createSavedProductsGVHistory(termekLista);
+				productsGV.setSizeFull();
+			addComponent(productsGV);
+
+			}
+
+		
+		});
+		this.addComponent(history);
+		this.setComponentAlignment(history, Alignment.BOTTOM_RIGHT);
+		
 	}
 
 	private void deleteProducts() {
@@ -93,27 +133,23 @@ public class ProfilView extends VerticalLayout implements View {
 
 		delete.addClickListener(new ClickListener() {
 			@Override
-			public void buttonClick(ClickEvent event) {		
-				torlendoElemek = grid.getSelectedItems();
-				String mentettElem = "";
-				for(String elem : productNames){
-					for(Product torlendo : torlendoElemek){
-						if(elem.equals(torlendo.getProductName())){
-							
-						}else{
-							mentettElem += elem + ";";
+			public void buttonClick(ClickEvent event) {
+				Collection<Product> selectedProducts = productsGV.getSelectedItems();
+				for (ShoppingCart kocsi : bevKocsiLista) {
+					for (Product product : selectedProducts) {
+						if (kocsi.getProduct().getId() == product.getId() && kocsi.getIsPaid() == 0) {
+
+							shoppingCartService.delete(kocsi);
 						}
 					}
+
 				}
-				actualUser.setSavedProducts(mentettElem);
-				userService.save(actualUser);
-				productNames = mentettElem.split(";");
-				//createSavedProductsGV(productNames);
+
 			}
 		});
 		this.addComponent(delete);
 		this.setComponentAlignment(delete, Alignment.BOTTOM_RIGHT);
-		
+
 	}
 
 	private void signOut() {
@@ -121,8 +157,8 @@ public class ProfilView extends VerticalLayout implements View {
 
 		signOut.addClickListener(new ClickListener() {
 			@Override
-			public void buttonClick(ClickEvent event) {		
-				
+			public void buttonClick(ClickEvent event) {
+
 				actualUser = null;
 				SignInView.setActualUser(null);
 				getUI().getNavigator().navigateTo(DefaultView.VIEW_NAME);
@@ -138,40 +174,41 @@ public class ProfilView extends VerticalLayout implements View {
 		paymentBtn.addClickListener(new ClickListener() {
 			@Override
 			public void buttonClick(ClickEvent event) {
-				if (actualUser.getSavedProducts() != null) {
-					getUI().getNavigator().navigateTo(PaymentView.VIEW_NAME);
-				} else {
-					Notification.show("Önnek nincsenek mentett termékei");
-				}
+
+				getUI().getNavigator().navigateTo(PaymentView.VIEW_NAME);
 
 			}
 		});
 		this.addComponent(paymentBtn);
 		this.setComponentAlignment(paymentBtn, Alignment.BOTTOM_RIGHT);
-		
 	}
 
-	private Grid<Product> createSavedProductsGV(String[] products) {
-		List<Product> savedProducts = new ArrayList<>();
-		Product productBuffer = null;
-		
-		for (String name : products) {
-			productBuffer = productService.listProductByProductName(name);
-			savedProducts.add(productBuffer);
-		}
-		grid.setItems(savedProducts);
-
-		grid.addColumn(Product::getId).setCaption("Azonosító").setHidden(true);
-		//grid.addColumn(Product::getCategoryId).setCaption("Kategória");
+	private Grid<Product> createSavedProductsGV(List<Product> lista) {
+		Grid<Product> grid = new Grid<>();
+		grid.setItems(lista);
+		grid.addColumn(Product::getCategory).setCaption("Kategória");
 		grid.addColumn(Product::getProductName).setCaption("Név");
 		grid.addColumn(Product::getDescription).setCaption("Leírás");
 		grid.addColumn(Product::getPrice, new NumberRenderer("%d Ft")).setCaption("Ár");
 		grid.addColumn(Product::getDiscount, new NumberRenderer("%d %%")).setCaption("Kedvezmény");
 		grid.getSelectionModel().setUserSelectionAllowed(true);
-		grid.setSelectionMode(SelectionMode.SINGLE);
+		grid.setSelectionMode(SelectionMode.MULTI);
 		return grid;
 	}
+	
+	private Grid<Product> createSavedProductsGVHistory(List<Product> termekLista) {
+		Grid<Product> grid = new Grid<>();
+		grid.setItems(termekLista);
+		grid.addColumn(Product::getCategory).setCaption("Kategória");
+		grid.addColumn(Product::getProductName).setCaption("Név");
+		grid.addColumn(Product::getDescription).setCaption("Leírás");
+		grid.addColumn(Product::getPrice, new NumberRenderer("%d Ft")).setCaption("Ár");
+		grid.addColumn(Product::getDiscount, new NumberRenderer("%d %%")).setCaption("Kedvezmény");
+		grid.getSelectionModel().setUserSelectionAllowed(false);
 
+		
+		return grid;
+	}
 	@Override
 	public void enter(ViewChangeEvent event) {
 		// nothing to do here.

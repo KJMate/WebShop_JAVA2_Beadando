@@ -43,5 +43,10 @@ public class ProductServiceImpl implements ProductService {
 	public void deleteProduct(Product product) {
 		this.productDao.delete(product);
 	}
+
+	@Override
+	public Product listProductsById(Integer id) {
+		return this.productDao.findByIdLike(id);
+	}
 	
 }

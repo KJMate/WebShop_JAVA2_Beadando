@@ -16,4 +16,6 @@ public interface ProductDao {
 	public Product save(Product product);
 	
 	public void delete(Product product);
+	
+	public Product findByIdLike(Integer id);
 }

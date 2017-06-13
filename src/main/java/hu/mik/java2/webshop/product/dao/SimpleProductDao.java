@@ -16,4 +16,6 @@ public interface SimpleProductDao extends JpaRepository<Product, Integer>{
 	public Product findByproductNameLike(String productName);
 	
 	public List<Product> findBydiscountGreaterThanEqual(Integer discountVal);
+	
+	public Product findByIdLike(Integer id);
 }
